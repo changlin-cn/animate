@@ -10,7 +10,8 @@ import {
     isUndefined,
     isDate,
     sort,
-    getOrSetProp
+    getOrSetProp,
+    extend
 } from 'changlin-util'
 import {requestAnimationFrame, cancelAnimationFrame} from "./af";
 
@@ -18,38 +19,27 @@ import {requestAnimationFrame, cancelAnimationFrame} from "./af";
 
 export function createAnimation(config) {
     if (isObject(!config)) throw new Error('createAnimation config should be object');
-    let {
-        //动画目标
-        target,
-        //关键帧
-        keyFrame,
-        //开始时间
-        startTime,
-        //是否自动更新目标状态
-        autoUpdate = true,
-        //动画持续时间（毫秒）
-        duration = 1000,
-        //动画持续时间（毫秒）
-        delay = 0,
-        //动画循环次数
-        loop = 1,
-        easing = compute.Linear,
-        onComplete = () => {
-        },
-        onStart = () => {
-        }
-    } = config;
 
     let result = {
-        target,
-        startTime,
-        autoUpdate,
-        duration,
-        delay,
-        loop,
-        easing,
-        onComplete,
-        onStart,
+        //动画目标
+        target:null,
+        //关键帧
+        keyFrame:null,
+        //开始时间
+        startTime:null,
+        //是否自动更新目标状态
+        autoUpdate:true,
+        //动画持续时间（毫秒）
+        duration:1000,
+        //动画延时时间
+        delay:0,
+        //动画循环次数
+        loop:1,
+        //关键帧属性值类型 (只对style特殊处理)
+        keyFramePropsType:'style',
+        easing:compute.Linear,
+        onComplete:()=>{},
+        onStart:()=>{},
         animation: [],
         timer: null,
         loopNow: 0,
@@ -57,8 +47,10 @@ export function createAnimation(config) {
         state: -1
     };
 
+    extend(result,config);
+
     //参数检查
-    if (!(isDOM(target) || isString(target) || isObject(target))) {
+    if (!(isDOM(result.target) || isString(result.target) || isObject(result.target))) {
         throw new Error('target is needed')
     } else if (isString(result.target)) {
         let temp = document.querySelector(result.target);
@@ -68,24 +60,24 @@ export function createAnimation(config) {
             throw new Error('target is needed')
         }
     }
-    if (!isBoolean(autoUpdate)) throw new Error('autoUpdate should be boolean');
-    if (!isNumber(duration)) throw new Error('duration should be number');
-    if (!isNumber(delay)) throw new Error('delay should be number');
-    if (!(isNumber(loop) || isBoolean(loop))) throw new Error('loop should be number or boolean');
-    if (!isFunction(easing)) throw new Error('easing should be function');
-    if (!isFunction(onComplete)) throw new Error('onComplete should be function');
-    if (!isFunction(onStart)) throw new Error('onStart should be function');
-    if (isUndefined(keyFrame)) throw new Error(' is needed');
+    if (!isBoolean(result.autoUpdate)) throw new Error('autoUpdate should be boolean');
+    if (!isNumber(result.duration)) throw new Error('duration should be number');
+    if (!isNumber(result.delay)) throw new Error('delay should be number');
+    if (!(isNumber(result.loop) || isBoolean(result.loop))) throw new Error('loop should be number or boolean');
+    if (!isFunction(result.easing)) throw new Error('easing should be function');
+    if (!isFunction(result.onComplete)) throw new Error('onComplete should be function');
+    if (!isFunction(result.onStart)) throw new Error('onStart should be function');
+    if (isUndefined(result.keyFrame)) throw new Error(' is needed');
 
     //获取动画开始时间
-    if (isNumber(startTime)) {
-        result.startTime = new Date(startTime + delay);
-    } else if (!isDate(startTime)) {
-        if (autoUpdate) result.startTime = new Date(Date.now() + delay);
+    if (isNumber(result.startTime)) {
+        result.startTime = new Date(result.startTime + delay);
+    } else if (!isDate(result.startTime)) {
+        if (result.autoUpdate) result.startTime = new Date(Date.now() + result.delay);
     }
 
     //处理keyframe
-    splitKeyframe({keyFrame, animation: result.animation});
+    splitKeyframe({keyFrame:result.keyFrame, animation: result.animation});
 
     //debugger
     function start() {
@@ -98,22 +90,22 @@ export function createAnimation(config) {
         }
     }
 
-    if (autoUpdate) {
+    if (result.autoUpdate) {
         start()
     }
 
     //debugger
     return {
         start() {
-            if (autoUpdate) return;
+            if (result.autoUpdate) return;
         },
         stop() {
-            if (autoUpdate) {
+            if (result.autoUpdate) {
                 cancelAnimationFrame(result.timer)
             }
         },
         update(time) {
-            if (autoUpdate) return;
+            if (result.autoUpdate) return;
             updateState(time, result)
         },
         get state() {
