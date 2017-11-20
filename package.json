@@ -1,0 +1,44 @@
+{
+  "name": "changlin-animate",
+  "version": "0.0.0",
+  "description": "animate jsAnimate css3",
+  "main": "commonjs/index.js",
+  "scripts": {
+    "build:umd": "webpack",
+    "build": "npm run build:commonjs && npm run build:umd",
+    "build:commonjs": "babel src -d commonjs",
+    "pb": "npm run build  && npm publish",
+    "start": "webpack-dev-server --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChangLin-CN/changlin-animate.git"
+  },
+  "keywords": [
+    "animation"
+  ],
+  "author": "changlin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChangLin-CN/changlin-animate/issues"
+  },
+  "homepage": "https://github.com/ChangLin-CN/changlin-animate#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.1",
+    "html-webpack-plugin": "^2.30.1",
+    "jquery": "1.12.3",
+    "mocha": "^3.5.0",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.23.0",
+    "changlin-util": "^2.3.3"
+  }
+}
