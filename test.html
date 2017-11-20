@@ -1,27 +1,165 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>changlin-animate demo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
-  <ul class="demo">
-    <li class="item">
-      <div class="title">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
 
-      </div>
-      <div class="code">
+    body {
+        background: #f8f8f8;
+    }
+
+    li {
+        list-style: none;
+    }
+
+    .item {
+        background: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .item .title {
+        color: #333;
+        font-size: 18px;
+        line-height: 30px;
+        border-bottom: #bdbdbd solid 1px;
+        margin-bottom: 10px;
+    }
+
+    .item .content {
+        height: 150px;
+        position: relative;
+    }
+
+    .item .code {
+        background: #e1e1e1;
+        padding: 10px;
+        border: #bdbdbd solid 1px;
+        box-sizing: border-box;
+        height: 140px;
+        overflow: scroll;
+        width: 300px;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .item .ani-wrap {
+        margin-left: 320px;
+        height: 140px;
+        background: #e1e1e1;
+    }
+
+</style>
+<body>
+
+
+<ul class="demo">
+    <li class="item">
+        <div class="title">
+            简单的补间动画
+        </div>
+        <div class="content">
+            <div class="code">
+        <pre>
+createAnimation({
+    target:document.querySelector('#ani'),
+    keyFrame:{'style.left':'300px','style.top':'100px'}
+});
+        </pre>
+            </div>
+            <div class="ani-wrap">
+                <div class="ani" id="ani"
+                     style="width:10px;height: 10px;position: relative;left:0;top:0;background: #00d6b2;"></div>
+            </div>
+        </div>
+
+    </li>
+
+    <li class="item">
+        <div class="title">
+            延时开始的补间动画
+        </div>
+        <div class="content">
+            <div class="code">
+        <pre>
+createAnimation({
+    target:'#ani2',
+    keyFrame:{'style.left':'700px','style.top':'150px'},
+    duration:3000,
+    delay:2000
+});
+        </pre>
+            </div>
+            <div class="ani-wrap">
+                <div class="ani" id="ani2"
+                     style="width:10px;height: 10px;position: relative;left:0;top:0;background: #00d6b2;"></div>
+            </div>
+        </div>
+
+    </li>
+
+    <li class="item">
+        <div class="title">
+            带有多个关键帧的补间动画
+        </div>
+        <div class="content">
+            <div class="code">
+        <pre>
+createAnimation({
+    target:'#ani3',
+    keyFrame:[
+        {'style.left':'0px','style.top':'0px',percent:0},
+        {'style.left':'200px','style.top':'0px',percent:25},
+        {'style.left':'200px','style.top':'120px',percent:50},
+        {'style.left':'0px','style.top':'120px',percent:75},
+        {'style.left':'0px','style.top':'0px',percent:100}
+        ],
+    duration:3000,
+    delay:5000
+});
+        </pre>
+            </div>
+            <div class="ani-wrap">
+                <div class="ani" id="ani3"
+                     style="width:10px;height: 10px;position: relative;left:0;top:0;background: red;"></div>
+            </div>
+        </div>
+
+    </li>
+
+    <li class="item">
+        <div class="title">
+            关键帧属性值为相对值的动画
+        </div>
+        <div class="content">
+            <div class="code">
         <pre>
 
+createAnimation({
+    target:'#ani4',
+    keyFrame:{'style.left':'+=300px','style.top':'-=100px'},
+    duration:3000,
+    delay:8000
+});
         </pre>
-      </div>
+            </div>
+            <div class="ani-wrap">
+                <div class="ani" id="ani4"
+                     style="width:10px;height: 10px;position: relative;left:0;top:100px;background: red;"></div>
+            </div>
+        </div>
+
     </li>
-  </ul>
+</ul>
 
-    <div class="ani" id="ani" style="width:10px;height: 10px;position: relative;left: 0px;top:0;background: #00d6b2;"></div>
-    <div class="ani" id="ani2" style="width:10px;height: 10px;position: relative;left: 0px;top:0;background: #00d6b2;"></div>
-    <div class="ani" id="ani3" style="width:10px;height: 10px;position: relative;left: 0px;top:0px;background: red;"></div>
 
-  </body>
+</body>
 </html>

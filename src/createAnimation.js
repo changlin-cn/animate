@@ -89,8 +89,11 @@ export function createAnimation(config) {
 
     //debugger
     function start() {
-        updateState(new Date(), result);
-        if (result.state === 0) {
+        let now=new Date();
+        if(now>=result.startTime){
+            updateState(now,result)
+        }
+        if (result.state < 1) {
             result.timer = requestAnimationFrame(start)
         }
     }
@@ -125,12 +128,12 @@ export function createAnimation(config) {
 
 
 function updateState(time, params) {
-    console.log('update');
+   // console.log('update');
     let timeProgress, progress;
 
     timeProgress = (time - params.startTime) / params.duration;
 
-    console.log(timeProgress);
+   // console.log(timeProgress);
 
     if (timeProgress >= 1) {
         params.state = 1;
@@ -168,9 +171,13 @@ function updateState(time, params) {
                         n.percent.unshift(0);
                     }
                 } else {
-                    let temp = splitUnit(getOrSetProp(params.target, n.key));
+                    let currentValue=getOrSetProp(params.target, n.key);
+                    if(currentValue===undefined){
+                        currentValue=0
+                    }
+                    let temp = splitUnit(currentValue);
                     n.startValue = temp.v;
-                    if (/^(\+=)\d+.?\d*$/.test(n.endValue)) {
+                    if (/^(-=)\d+.?\d*$/.test(n.endValue)) {
                         n.endValue = n.startValue - Number(n.endValue.replace('-=', ''));
                     } else if (/^(\+=)\d+.?\d*$/.test(n.endValue)) {
                         n.endValue = n.startValue + Number(n.endValue.replace('+=', ''));
@@ -203,7 +210,7 @@ function updateState(time, params) {
                     }
                     if(isLast||shouldBreak){
                         getOrSetProp(params.target, n.key, value);
-                        console.log(n.key,value);
+                       // console.log(n.key,value);
                     }
                     if(shouldBreak)break;
                 }
