@@ -5,12 +5,12 @@ import {easing} from "./src/easing";
 
 createAnimation({
     target:document.querySelector('#ani'),
-    keyFrame:{'style.left':'300px','style.top':'100px'}
+    keyFrame:{'left':'300px','top':'100px'}
 });
 
 createAnimation({
     target:'#ani2',
-    keyFrame:{'style.left':'700px','style.top':'150px'},
+    keyFrame:{'left':'700px','top':'150px'},
     duration:3000,
     delay:2000
 });
@@ -18,11 +18,11 @@ createAnimation({
 createAnimation({
     target:'#ani3',
     keyFrame:[
-        {'style.left':'0px','style.top':'0px',percent:0},
-        {'style.left':'200px','style.top':'0px',percent:25},
-        {'style.left':'200px','style.top':'120px',percent:50},
-        {'style.left':'0px','style.top':'120px',percent:75},
-        {'style.left':'0px','style.top':'0px',percent:100}
+        {'left':'0px','top':'0px',percent:0},
+        {'left':'200px','top':'0px',percent:25},
+        {'left':'200px','top':'120px',percent:50},
+        {'left':'0px','top':'120px',percent:75},
+        {'left':'0px','top':'0px',percent:100}
         ],
     duration:3000,
     delay:5000,
@@ -31,7 +31,7 @@ createAnimation({
 
 createAnimation({
     target:'#ani4',
-    keyFrame:{'style.left':'+=300px','style.top':'-=100px'},
+    keyFrame:{'left':'+=300px','top':'-=100px'},
     duration:3000,
     delay:8000
 });

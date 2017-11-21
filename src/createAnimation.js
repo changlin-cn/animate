@@ -13,33 +13,36 @@ import {
     getOrSetProp,
     extend
 } from 'changlin-util'
+import {css,cssPrefix} from "./css";
 import {requestAnimationFrame, cancelAnimationFrame} from "./af";
-
 
 
 export function createAnimation(config) {
     if (isObject(!config)) throw new Error('createAnimation config should be object');
 
-    let result = {
+    let animationConfig = {
         //动画目标
-        target:null,
+        target: null,
         //关键帧
-        keyFrame:null,
+        keyFrame: null,
         //开始时间
-        startTime:null,
+        startTime: null,
         //是否自动更新目标状态
-        autoUpdate:true,
+        autoUpdate: true,
         //动画持续时间（毫秒）
-        duration:1000,
+        duration: 1000,
         //动画延时时间
-        delay:0,
+        delay: 0,
         //动画循环次数
-        loop:1,
-        //关键帧属性值类型 (只对style特殊处理)
-        keyFramePropsType:'style',
-        easing:compute.Linear,
-        onComplete:()=>{},
-        onStart:()=>{},
+        loop: 1,
+        //关键帧属性值类型 (只对css特殊处理)
+        keyFramePropsType: 'css',
+       // useTransition:'true',
+        easing: compute.Linear,
+        onComplete: () => {
+        },
+        onStart: () => {
+        },
         animation: [],
         timer: null,
         loopNow: 0,
@@ -47,72 +50,79 @@ export function createAnimation(config) {
         state: -1
     };
 
-    extend(result,config);
+    extend(animationConfig, config);
 
     //参数检查
-    if (!(isDOM(result.target) || isString(result.target) || isObject(result.target))) {
+    if (!(isDOM(animationConfig.target) || isString(animationConfig.target) || isObject(animationConfig.target))) {
         throw new Error('target is needed')
-    } else if (isString(result.target)) {
-        let temp = document.querySelector(result.target);
+    } else if (isString(animationConfig.target)) {
+        let temp = document.querySelector(animationConfig.target);
         if (temp) {
-            result.target = temp
+            animationConfig.target = temp
         } else {
             throw new Error('target is needed')
         }
     }
-    if (!isBoolean(result.autoUpdate)) throw new Error('autoUpdate should be boolean');
-    if (!isNumber(result.duration)) throw new Error('duration should be number');
-    if (!isNumber(result.delay)) throw new Error('delay should be number');
-    if (!(isNumber(result.loop) || isBoolean(result.loop))) throw new Error('loop should be number or boolean');
-    if (!isFunction(result.easing)) throw new Error('easing should be function');
-    if (!isFunction(result.onComplete)) throw new Error('onComplete should be function');
-    if (!isFunction(result.onStart)) throw new Error('onStart should be function');
-    if (isUndefined(result.keyFrame)) throw new Error(' is needed');
+    if (!isBoolean(animationConfig.autoUpdate)) throw new Error('autoUpdate should be boolean');
+    if (!isNumber(animationConfig.duration)) throw new Error('duration should be number');
+    if (!isNumber(animationConfig.delay)) throw new Error('delay should be number');
+    if (!(isNumber(animationConfig.loop) || isBoolean(animationConfig.loop))) throw new Error('loop should be number or boolean');
+    if (!isFunction(animationConfig.easing)) throw new Error('easing should be function');
+    if (!isFunction(animationConfig.onComplete)) throw new Error('onComplete should be function');
+    if (!isFunction(animationConfig.onStart)) throw new Error('onStart should be function');
+    if (isUndefined(animationConfig.keyFrame)) throw new Error(' is needed');
 
     //获取动画开始时间
-    if (isNumber(result.startTime)) {
-        result.startTime = new Date(result.startTime + delay);
-    } else if (!isDate(result.startTime)) {
-        if (result.autoUpdate) result.startTime = new Date(Date.now() + result.delay);
+    if (isNumber(animationConfig.startTime)) {
+        animationConfig.startTime = new Date(animationConfig.startTime + delay);
+    } else if (!isDate(animationConfig.startTime)) {
+        if (animationConfig.autoUpdate) animationConfig.startTime = new Date(Date.now() + animationConfig.delay);
     }
 
     //处理keyframe
-    splitKeyframe({keyFrame:result.keyFrame, animation: result.animation});
+    splitKeyframe({keyFrame: animationConfig.keyFrame, animation: animationConfig.animation,keyFramePropsType:animationConfig.keyFramePropsType});
+
+    // debugger
+    if (animationConfig.keyFramePropsType === 'css') {
+        animationConfig._getOrSetProp = css
+    } else {
+        animationConfig._getOrSetProp = getOrSetProp
+    }
 
     //debugger
     function start() {
-        let now=new Date();
-        if(now>=result.startTime){
-            updateState(now,result)
+        let now = new Date();
+        if (now >= animationConfig.startTime) {
+            updateState(now, animationConfig)
         }
-        if (result.state < 1) {
-            result.timer = requestAnimationFrame(start)
+        if (animationConfig.state < 1) {
+            animationConfig.timer = requestAnimationFrame(start)
         }
     }
 
-    if (result.autoUpdate) {
+    if (animationConfig.autoUpdate) {
         start()
     }
 
     //debugger
     return {
         start() {
-            if (result.autoUpdate) return;
+            if (animationConfig.autoUpdate) return;
         },
         stop() {
-            if (result.autoUpdate) {
-                cancelAnimationFrame(result.timer)
+            if (animationConfig.autoUpdate) {
+                cancelAnimationFrame(animationConfig.timer)
             }
         },
         update(time) {
-            if (result.autoUpdate) return;
-            updateState(time, result)
+            if (animationConfig.autoUpdate) return;
+            updateState(time, animationConfig)
         },
         get state() {
-            return result.state
+            return animationConfig.state
         },
         set state(any) {
-            return result.state
+            return animationConfig.state
         }
 
     }
@@ -120,21 +130,21 @@ export function createAnimation(config) {
 
 
 function updateState(time, params) {
-   // console.log('update');
+    // console.log('update');
     let timeProgress, progress;
 
     timeProgress = (time - params.startTime) / params.duration;
 
-   // console.log(timeProgress);
+    // console.log(timeProgress);
 
     if (timeProgress >= 1) {
         params.state = 1;
         //动画完成
         params.animation.forEach(function (n) {
             if (isArray(n.percent)) {
-                getOrSetProp(params.target, n.key, n.values[n.values.length - 1]);
+                params._getOrSetProp(params.target, n.key, n.values[n.values.length - 1] + n.unit);
             } else {
-                getOrSetProp(params.target, n.key, n.endValue);
+                params._getOrSetProp(params.target, n.key, n.endValue + n.unit);
             }
 
         });
@@ -157,15 +167,15 @@ function updateState(time, params) {
         //如果动画从未执行过
         if (params.state === -1) {
             params.animation.forEach(function (n, idx) {
-                if (isArray(n.percent) ) {
-                    if(n.percent[0] !== 0){
-                        n.values.unshift(splitUnit(getOrSetProp(params.target, n.key)).v);
+                if (isArray(n.percent)) {
+                    if (n.percent[0] !== 0) {
+                        n.values.unshift(splitUnit(params._getOrSetProp(params.target, n.key)).v);
                         n.percent.unshift(0);
                     }
                 } else {
-                    let currentValue=getOrSetProp(params.target, n.key);
-                    if(currentValue===undefined){
-                        currentValue=0
+                    let currentValue = params._getOrSetProp(params.target, n.key);
+                    if (currentValue === undefined) {
+                        currentValue = 0
                     }
                     let temp = splitUnit(currentValue);
                     n.startValue = temp.v;
@@ -190,21 +200,22 @@ function updateState(time, params) {
             let i, value;
             if (isArray(n.percent)) {
                 for (i = 1; i < n.percent.length; i++) {
-                    let shouldBreak=n.percent[i] > progress;
-                    let isLast=i === n.percent.length - 1;
+                    let shouldBreak = n.percent[i] > progress;
+                    let isLast = i === n.percent.length - 1;
                     if (shouldBreak) {
                         value = (progress - n.percent[i - 1]) / (n.percent[i] - n.percent[i - 1]) * (n.values[i] - n.values[i - 1]) + n.values[i - 1];
                     } else if (isLast) {
-                        value=n.values[i];
+                        value = n.values[i];
                     }
-                    if(n.unit){
-                        value+=n.unit;
-                    }
-                    if(isLast||shouldBreak){
-                        getOrSetProp(params.target, n.key, value);
+
+                    value += n.unit;
+
+                    if (isLast || shouldBreak) {
+                        debugger
+                        params._getOrSetProp(params.target, n.key, value);
                        // console.log(n.key,value);
                     }
-                    if(shouldBreak)break;
+                    if (shouldBreak) break;
                 }
             } else {
 
@@ -213,7 +224,7 @@ function updateState(time, params) {
                     temp += n.unit;
                 }
                 // console.log(temp);
-                getOrSetProp(params.target, n.key, temp);
+                params._getOrSetProp(params.target, n.key, temp);
             }
         });
     }
@@ -221,7 +232,7 @@ function updateState(time, params) {
 
 
 //将多种属性结合成的关键帧动画拆分成单一属性的动画组
-function splitKeyframe({keyFrame, animation}) {
+function splitKeyframe({keyFrame, animation,keyFramePropsType}) {
 
     if (isArray(keyFrame)) {
         //至少需要一个关键帧
@@ -240,7 +251,7 @@ function splitKeyframe({keyFrame, animation}) {
         //将多种属性结合成的关键帧动画拆分成单一属性的动画组
         for (let each in  keyFrame[0]) {
             if (each !== 'percent') {
-                let oneP = {key: each, percent: [], values: [], unit: undefined};
+                let oneP = {key: keyFramePropsType==='css'? cssPrefix(each):each, percent: [], values: [], unit: ''};
 
                 for (let i = 0; i < keyFrame.length; i++) {
                     let temp = splitUnit(keyFrame[i][each]);
@@ -268,7 +279,7 @@ function splitKeyframe({keyFrame, animation}) {
 
 
 function splitUnit(value) {
-    let v, unit;
+    let v, unit = '';
 
     if (/^((?:[-+]=?)?\d+(?:.\d+)?)([%a-zA-Z]*)/.test(value)) {
 
