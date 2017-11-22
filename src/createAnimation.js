@@ -142,7 +142,12 @@ export function createAnimation(config) {
         },
         stop() {
             if (animationConfig.autoUpdate) {
-                cancelAnimationFrame(animationConfig.timer)
+                if(animationConfig.useTransition){
+                    stopTransition(animationConfig);
+                    removeEvent(animationConfig.target,transitionEventName,handleTransitionComplete);
+                }else{
+                    cancelAnimationFrame(animationConfig.timer);
+                }
             }
         },
         update(time) {
@@ -252,7 +257,7 @@ function updateState(time, params) {
                     value += n.unit;
 
                     if (isLast || shouldBreak) {
-                        debugger
+                        //debugger
                         params._getOrSetProp(params.target, n.key, value);
                        // console.log(n.key,value);
                     }
@@ -324,6 +329,15 @@ function splitKeyframe({keyFrame, animation,keyFramePropsType,useTransition}) {
             }
         }
     }
+}
+
+function stopTransition(animationConfig){
+    let currentStyle=window.getComputedStyle(animationConfig.target);
+    for(let i=0;i<animationConfig.animation.length;i++){
+        let temp=animationConfig.animation[i].key;
+        css(animationConfig.target,temp,currentStyle[temp]);
+    }
+    css(animationConfig.target,'transitionProperty','none');
 }
 
 
