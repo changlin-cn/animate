@@ -13,7 +13,7 @@ declare module "changlin-animate" {
         autoUpDate?: boolean;
         type?: string;
         loop?: boolean|number;
-
+        useTransition:boolean;
         easing?(progress: number, startValue: number, distance: number): number;
 
         onComplete?(): void;

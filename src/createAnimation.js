@@ -1,4 +1,4 @@
-import {easing as compute} from "./easing";
+import {easing as compute,transitionTimingFunction} from "./easing";
 import {
     isObject,
     isDOM,
@@ -13,32 +13,45 @@ import {
     getOrSetProp,
     extend
 } from 'changlin-util'
-import {css,cssPrefix} from "./css";
+import {css,cssPrefix,addEvent,removeEvent} from "./dom";
 import {requestAnimationFrame, cancelAnimationFrame} from "./af";
 
 
+const transitionEventName=(()=>{
+    const transitions = {
+        'transition':'transitionend',
+        'OTransition':'oTransitionEnd',
+        'MozTransition':'transitionend',
+        'WebkitTransition':'webkitTransitionEnd'
+    }
+    return transitions[cssPrefix('transition')]
+})();
+
+
 export function createAnimation(config) {
+
+    //console.time('start');
+
     if (isObject(!config)) throw new Error('createAnimation config should be object');
 
     let animationConfig = {
-        //动画目标
+        //The target that which will animate
         target: null,
-        //关键帧
+
         keyFrame: null,
-        //开始时间
+
         startTime: null,
-        //是否自动更新目标状态
+        //Will be auto update status?
         autoUpdate: true,
-        //动画持续时间（毫秒）
+        //Unit:ms
         duration: 1000,
-        //动画延时时间
         delay: 0,
-        //动画循环次数
         loop: 1,
-        //关键帧属性值类型 (只对css特殊处理)
+        //The type of keyFrame's props (it is going to do a special treatment of 'css')
         keyFramePropsType: 'css',
-       // useTransition:'true',
-        easing: compute.Linear,
+        //use CSS3 transition?
+        useTransition:true,
+        easing: transitionTimingFunction.easeInOut,
         onComplete: () => {
         },
         onStart: () => {
@@ -46,13 +59,13 @@ export function createAnimation(config) {
         animation: [],
         timer: null,
         loopNow: 0,
-        //状态  -1未开始  0正在进行 1已结束
+        //state:  -1 not started    0 in progress   1 over
         state: -1
     };
 
     extend(animationConfig, config);
 
-    //参数检查
+    //check the type of arguments
     if (!(isDOM(animationConfig.target) || isString(animationConfig.target) || isObject(animationConfig.target))) {
         throw new Error('target is needed')
     } else if (isString(animationConfig.target)) {
@@ -63,11 +76,12 @@ export function createAnimation(config) {
             throw new Error('target is needed')
         }
     }
+
     if (!isBoolean(animationConfig.autoUpdate)) throw new Error('autoUpdate should be boolean');
     if (!isNumber(animationConfig.duration)) throw new Error('duration should be number');
     if (!isNumber(animationConfig.delay)) throw new Error('delay should be number');
     if (!(isNumber(animationConfig.loop) || isBoolean(animationConfig.loop))) throw new Error('loop should be number or boolean');
-    if (!isFunction(animationConfig.easing)) throw new Error('easing should be function');
+    if (!(isFunction(animationConfig.easing)||isString(animationConfig.easing))) throw new Error('easing should be function');
     if (!isFunction(animationConfig.onComplete)) throw new Error('onComplete should be function');
     if (!isFunction(animationConfig.onStart)) throw new Error('onStart should be function');
     if (isUndefined(animationConfig.keyFrame)) throw new Error(' is needed');
@@ -79,30 +93,47 @@ export function createAnimation(config) {
         if (animationConfig.autoUpdate) animationConfig.startTime = new Date(Date.now() + animationConfig.delay);
     }
 
-    //处理keyframe
-    splitKeyframe({keyFrame: animationConfig.keyFrame, animation: animationConfig.animation,keyFramePropsType:animationConfig.keyFramePropsType});
+    //transform keyframe
+    splitKeyframe(animationConfig);
+
+    function handleTransitionComplete(e) {
+
+        animationConfig.onComplete.call(animationConfig.target,e);
+        removeEvent(animationConfig.target,transitionEventName,handleTransitionComplete)
+    }
 
     // debugger
-    if (animationConfig.keyFramePropsType === 'css') {
-        animationConfig._getOrSetProp = css
-    } else {
-        animationConfig._getOrSetProp = getOrSetProp
+    if(!animationConfig.useTransition){
+        if(isString( animationConfig.easing)){
+            animationConfig.easing=compute.Cubic.easeInOut;
+        }
+        if (animationConfig.keyFramePropsType === 'css') {
+            animationConfig._getOrSetProp = css
+        } else {
+            animationConfig._getOrSetProp = getOrSetProp
+        }
+
+        if (animationConfig.autoUpdate) {
+            start()
+        }
+    }else{
+        css(animationConfig.target,'transitionProperty','all');
+        css(animationConfig.target,'transitionDuration',animationConfig.duration+'ms');
+        css(animationConfig.target,'transitionTimingFunction',animationConfig.easing);
+        css(animationConfig.target,'transitionDelay',animationConfig.delay+'ms');
+
+        addEvent(animationConfig.target,transitionEventName,handleTransitionComplete);
+        animationConfig.onStart.call(animationConfig.target);
+        animationConfig.state=0;
+        animationConfig.animation.forEach((n,i)=>{
+            css(animationConfig.target,n.key,n.endValue);
+        });
+
+
+        //console.timeEnd('start');
     }
 
-    //debugger
-    function start() {
-        let now = new Date();
-        if (now >= animationConfig.startTime) {
-            updateState(now, animationConfig)
-        }
-        if (animationConfig.state < 1) {
-            animationConfig.timer = requestAnimationFrame(start)
-        }
-    }
 
-    if (animationConfig.autoUpdate) {
-        start()
-    }
 
     //debugger
     return {
@@ -125,6 +156,16 @@ export function createAnimation(config) {
             return animationConfig.state
         }
 
+    };
+
+    function start() {
+        let now = new Date();
+        if (now >= animationConfig.startTime) {
+            updateState(now, animationConfig)
+        }
+        if (animationConfig.state < 1) {
+            animationConfig.timer = requestAnimationFrame(start)
+        }
     }
 }
 
@@ -232,9 +273,9 @@ function updateState(time, params) {
 
 
 //将多种属性结合成的关键帧动画拆分成单一属性的动画组
-function splitKeyframe({keyFrame, animation,keyFramePropsType}) {
+function splitKeyframe({keyFrame, animation,keyFramePropsType,useTransition}) {
 
-    if (isArray(keyFrame)) {
+    if (isArray(keyFrame)&&!useTransition) {
         //至少需要一个关键帧
         if (keyFrame.length < 1) return;
 
@@ -254,7 +295,7 @@ function splitKeyframe({keyFrame, animation,keyFramePropsType}) {
                 let oneP = {key: keyFramePropsType==='css'? cssPrefix(each):each, percent: [], values: [], unit: ''};
 
                 for (let i = 0; i < keyFrame.length; i++) {
-                    let temp = splitUnit(keyFrame[i][each]);
+                    let temp = splitUnit(keyFrame[i][each],true);
                     oneP.percent.push(keyFrame[i].percent);
                     oneP.values.push(temp.v);
                     oneP.unit = temp.unit;
@@ -265,23 +306,37 @@ function splitKeyframe({keyFrame, animation,keyFramePropsType}) {
 
     } else {
         for (let each in keyFrame) {
-            let temp = splitUnit(keyFrame[each]);
-            if (isUndefined(temp)) return;
+            if(useTransition){
+                animation.push({
+                    key: keyFramePropsType === 'css' ? cssPrefix(each) : each,
+                    endValue: keyFrame[each],
+                    unit: ''
+                })
+            }else{
+                let temp = splitUnit(keyFrame[each],true);
+                if (isUndefined(temp.v)) return;
 
-            animation.push({
-                key: each,
-                endValue: temp.v,
-                unit: temp.unit
-            })
+                animation.push({
+                    key: keyFramePropsType === 'css' ? cssPrefix(each) : each,
+                    endValue: temp.v,
+                    unit: temp.unit
+                })
+            }
         }
     }
 }
 
 
-function splitUnit(value) {
+function splitUnit(value,relative=false) {
     let v, unit = '';
+    let reg;
+    if(relative){
+        reg=/^((?:[-+]=?)?\d+(?:.\d+)?)([%a-zA-Z]*)/
+    }else{
+        reg=/^((?:[-+])?\d+(?:.\d+)?)([%a-zA-Z]*)/
+    }
 
-    if (/^((?:[-+]=?)?\d+(?:.\d+)?)([%a-zA-Z]*)/.test(value)) {
+    if (reg.test(value)) {
 
         let temp = RegExp.$1;
         unit = RegExp.$2;
