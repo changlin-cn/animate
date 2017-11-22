@@ -1,10 +1,16 @@
 import {createAnimation} from "./src/createAnimation";
 import {easing} from "./src/easing";
 
+let el5=document.querySelector('#ani5');
 createAnimation({
-    target:document.querySelector('#ani5'),
+    target:el5,
     keyFrame:{'left':'300px','top':'100px'},
-    onComplete:(e)=>console.log(e)
+    onStart(){
+        el5.innerHTML='Start Animation'
+    },
+    onComplete(e){
+        el5.innerHTML='animation complete'
+    }
 });
 
 
