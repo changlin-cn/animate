@@ -69,7 +69,17 @@
         <div class="content">
             <div class="code">
         <pre>
-
+ let el5=document.querySelector('#ani5');
+    createAnimation({
+        target:el5,
+        keyFrame:{'left':'300px','top':'100px'},
+        onStart(){
+            el5.innerHTML='Start Animation'
+        },
+        onComplete(e){
+            el5.innerHTML='animation complete'
+        }
+    });
         </pre>
             </div>
             <div class="ani-wrap">
@@ -87,7 +97,13 @@
         <div class="content">
             <div class="code">
         <pre>
-
+ let el6=document.querySelector('#ani6');
+    let ani6= createAnimation({
+        target:el6,
+        keyFrame:{'transform':'rotate(170deg) scale(2,2)','left':'100px'},
+        duration:4000
+    });
+    setTimeout(()=>ani6.stop(),2500);
         </pre>
             </div>
             <div class="ani-wrap">
@@ -105,10 +121,12 @@
         <div class="content">
             <div class="code">
         <pre>
-createAnimation({
-    target:document.querySelector('#ani'),
-    keyFrame:{'style.left':'300px','style.top':'100px'}
-});
+
+    createAnimation({
+        target:document.querySelector('#ani'),
+        keyFrame:{'left':'300px','top':'100px'},
+        useTransition:false,
+    });
         </pre>
             </div>
             <div class="ani-wrap">
@@ -127,11 +145,12 @@ createAnimation({
             <div class="code">
         <pre>
 createAnimation({
-    target:'#ani2',
-    keyFrame:{'style.left':'700px','style.top':'150px'},
-    duration:3000,
-    delay:2000
-});
+        target:'#ani2',
+        keyFrame:{'left':'700px','top':'150px'},
+        duration:3000,
+        delay:2000,
+        useTransition:false,
+    });
         </pre>
             </div>
             <div class="ani-wrap">
@@ -150,17 +169,19 @@ createAnimation({
             <div class="code">
         <pre>
 createAnimation({
-    target:'#ani3',
-    keyFrame:[
-        {'style.left':'0px','style.top':'0px',percent:0},
-        {'style.left':'200px','style.top':'0px',percent:25},
-        {'style.left':'200px','style.top':'120px',percent:50},
-        {'style.left':'0px','style.top':'120px',percent:75},
-        {'style.left':'0px','style.top':'0px',percent:100}
+        target:'#ani3',
+        keyFrame:[
+            {'left':'0px','top':'0px',percent:0},
+            {'left':'200px','top':'0px',percent:25},
+            {'left':'200px','top':'120px',percent:50},
+            {'left':'0px','top':'120px',percent:75},
+            {'left':'0px','top':'0px',percent:100}
         ],
-    duration:3000,
-    delay:5000
-});
+        duration:3000,
+        useTransition:false,
+        delay:5000,
+
+    });
         </pre>
             </div>
             <div class="ani-wrap">
@@ -180,11 +201,13 @@ createAnimation({
         <pre>
 
 createAnimation({
-    target:'#ani4',
-    keyFrame:{'style.left':'+=300px','style.top':'-=100px'},
-    duration:3000,
-    delay:8000
-});
+        target:'#ani4',
+        keyFrame:{'left':'+=300px','top':'-=100px'},
+        duration:3000,
+        delay:8000,
+        useTransition:false,
+
+    });
         </pre>
             </div>
             <div class="ani-wrap">

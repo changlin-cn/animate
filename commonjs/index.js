@@ -4,16 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _easing = require('./easing');
-
-Object.defineProperty(exports, 'easing', {
-  enumerable: true,
-  get: function get() {
-    return _easing.easing;
-  }
-});
-
-var _createAnimation = require('./createAnimation');
+var _createAnimation = require('./createAnimation.js');
 
 Object.defineProperty(exports, 'createAnimation', {
   enumerable: true,
@@ -22,17 +13,17 @@ Object.defineProperty(exports, 'createAnimation', {
   }
 });
 
-var _af = require('./af');
+var _easing = require('./easing.js');
 
-Object.defineProperty(exports, 'cancelAnimationFrame', {
+Object.defineProperty(exports, 'transitionTimingFunction', {
   enumerable: true,
   get: function get() {
-    return _af.cancelAnimationFrame;
+    return _easing.transitionTimingFunction;
   }
 });
-Object.defineProperty(exports, 'requestAnimationFrame', {
+Object.defineProperty(exports, 'easing', {
   enumerable: true,
   get: function get() {
-    return _af.requestAnimationFrame;
+    return _easing.easing;
   }
 });

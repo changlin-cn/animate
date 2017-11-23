@@ -2,7 +2,7 @@
 
 declare module "changlin-animate" {
 
-    export function createAnimation(config: createConfig): animation
+    export function createAnimation(config: createConfig|createConfig2): animation
 
     interface createConfig {
         target: string | object ;
@@ -13,11 +13,27 @@ declare module "changlin-animate" {
         autoUpDate?: boolean;
         type?: string;
         loop?: boolean|number;
-        useTransition:boolean;
-        easing?(progress: number, startValue: number, distance: number): number;
-
+        useTransition:false;
+        easing?:(progress: number, startValue: number, distance: number)=> number;
         onComplete?(): void;
+        onStart?(): void;
     }
+
+    interface createConfig2 {
+        target: string | object ;
+        keyFrame: onekeyFrame;
+        startTime?: number | object;
+        duration?:number;
+        delay?:number;
+        autoUpDate: true;
+        type?: string;
+        loop?: boolean|number;
+        useTransition?:true;
+        easing?:string;
+        onComplete?(): void;
+        onStart?(): void;
+    }
+
 
     interface animation {
         start(): this;

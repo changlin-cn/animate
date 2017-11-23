@@ -1,11 +1,10 @@
 {
   "name": "changlin-animate",
-  "version": "0.0.0",
-  "description": "animate jsAnimate css3",
+  "version": "1.0.0",
+  "description": "animate:js animate or css3 transition",
   "main": "commonjs/index.js",
   "scripts": {
-    "build:umd": "webpack",
-    "build": "npm run build:commonjs && npm run build:umd",
+    "build": "npm run build:commonjs",
     "build:commonjs": "babel src -d commonjs",
     "pb": "npm run build  && npm publish",
     "start": "webpack-dev-server --open"
@@ -39,6 +38,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.23.0",
-    "changlin-util": "^2.3.3"
+    "changlin-util": "2.5.0",
+    "changlin-wdtools": "1.1.1"
   }
 }

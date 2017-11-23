@@ -1,17 +1,15 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.createAnimation = createAnimation;
 
-var _easing = require("./easing");
+var _easing = require('./easing');
 
-var _changlinUtil = require("changlin-util");
+var _changlinUtil = require('changlin-util');
 
-var _dom = require("./dom");
-
-var _af = require("./af");
+var _changlinWdtools = require('changlin-wdtools');
 
 var transitionEventName = function () {
     var transitions = {
@@ -20,7 +18,7 @@ var transitionEventName = function () {
         'MozTransition': 'transitionend',
         'WebkitTransition': 'webkitTransitionEnd'
     };
-    return transitions[(0, _dom.cssPrefix)('transition')];
+    return transitions[(0, _changlinWdtools.cssPrefix)('transition')];
 }();
 
 function createAnimation(config) {
@@ -92,7 +90,7 @@ function createAnimation(config) {
     function handleTransitionComplete(e) {
 
         animationConfig.onComplete.call(animationConfig.target, e);
-        (0, _dom.removeEvent)(animationConfig.target, transitionEventName, handleTransitionComplete);
+        (0, _changlinWdtools.removeEventListener)(animationConfig.target, transitionEventName, handleTransitionComplete);
     }
 
     // debugger
@@ -101,7 +99,7 @@ function createAnimation(config) {
             animationConfig.easing = _easing.easing.Cubic.easeInOut;
         }
         if (animationConfig.keyFramePropsType === 'css') {
-            animationConfig._getOrSetProp = _dom.css;
+            animationConfig._getOrSetProp = _changlinWdtools.css;
         } else {
             animationConfig._getOrSetProp = _changlinUtil.getOrSetProp;
         }
@@ -110,16 +108,16 @@ function createAnimation(config) {
             start();
         }
     } else {
-        (0, _dom.css)(animationConfig.target, 'transitionProperty', 'all');
-        (0, _dom.css)(animationConfig.target, 'transitionDuration', animationConfig.duration + 'ms');
-        (0, _dom.css)(animationConfig.target, 'transitionTimingFunction', animationConfig.easing);
-        (0, _dom.css)(animationConfig.target, 'transitionDelay', animationConfig.delay + 'ms');
+        (0, _changlinWdtools.css)(animationConfig.target, 'transitionProperty', 'all');
+        (0, _changlinWdtools.css)(animationConfig.target, 'transitionDuration', animationConfig.duration + 'ms');
+        (0, _changlinWdtools.css)(animationConfig.target, 'transitionTimingFunction', animationConfig.easing);
+        (0, _changlinWdtools.css)(animationConfig.target, 'transitionDelay', animationConfig.delay + 'ms');
 
-        (0, _dom.addEvent)(animationConfig.target, transitionEventName, handleTransitionComplete);
+        (0, _changlinWdtools.addEventListener)(animationConfig.target, transitionEventName, handleTransitionComplete);
         animationConfig.onStart.call(animationConfig.target);
         animationConfig.state = 0;
         animationConfig.animation.forEach(function (n, i) {
-            (0, _dom.css)(animationConfig.target, n.key, n.endValue);
+            (0, _changlinWdtools.css)(animationConfig.target, n.key, n.endValue);
         });
 
         //console.timeEnd('start');
@@ -134,9 +132,9 @@ function createAnimation(config) {
             if (animationConfig.autoUpdate) {
                 if (animationConfig.useTransition) {
                     stopTransition(animationConfig);
-                    (0, _dom.removeEvent)(animationConfig.target, transitionEventName, handleTransitionComplete);
+                    (0, _changlinWdtools.removeEventListener)(animationConfig.target, transitionEventName, handleTransitionComplete);
                 } else {
-                    (0, _af.cancelAnimationFrame)(animationConfig.timer);
+                    (0, _changlinWdtools.cancelAnimationFrame)(animationConfig.timer);
                 }
             }
         },
@@ -160,7 +158,7 @@ function createAnimation(config) {
             updateState(now, animationConfig);
         }
         if (animationConfig.state < 1) {
-            animationConfig.timer = (0, _af.requestAnimationFrame)(start);
+            animationConfig.timer = (0, _changlinWdtools.requestAnimationFrame)(start);
         }
     }
 }
@@ -204,7 +202,7 @@ function updateState(time, params) {
             params.animation.forEach(function (n, idx) {
                 if ((0, _changlinUtil.isArray)(n.percent)) {
                     if (n.percent[0] !== 0) {
-                        n.values.unshift(splitUnit(params._getOrSetProp(params.target, n.key)).v);
+                        n.values.unshift((0, _changlinUtil.splitUnit)(params._getOrSetProp(params.target, n.key)).value);
                         n.percent.unshift(0);
                     }
                 } else {
@@ -212,8 +210,8 @@ function updateState(time, params) {
                     if (currentValue === undefined) {
                         currentValue = 0;
                     }
-                    var temp = splitUnit(currentValue);
-                    n.startValue = temp.v;
+                    var temp = (0, _changlinUtil.splitUnit)(currentValue);
+                    n.startValue = temp.value;
                     if (/^(-=)\d+.?\d*$/.test(n.endValue)) {
                         n.endValue = n.startValue - Number(n.endValue.replace('-=', ''));
                     } else if (/^(\+=)\d+.?\d*$/.test(n.endValue)) {
@@ -289,12 +287,12 @@ function splitKeyframe(_ref) {
         //将多种属性结合成的关键帧动画拆分成单一属性的动画组
         for (var each in keyFrame[0]) {
             if (each !== 'percent') {
-                var oneP = { key: keyFramePropsType === 'css' ? (0, _dom.cssPrefix)(each) : each, percent: [], values: [], unit: '' };
+                var oneP = { key: keyFramePropsType === 'css' ? (0, _changlinWdtools.cssPrefix)(each) : each, percent: [], values: [], unit: '' };
 
                 for (var _i = 0; _i < keyFrame.length; _i++) {
-                    var temp = splitUnit(keyFrame[_i][each], true);
+                    var temp = (0, _changlinUtil.splitUnit)(keyFrame[_i][each], true);
                     oneP.percent.push(keyFrame[_i].percent);
-                    oneP.values.push(temp.v);
+                    oneP.values.push(temp.value);
                     oneP.unit = temp.unit;
                 }
                 animation.push(oneP);
@@ -304,17 +302,17 @@ function splitKeyframe(_ref) {
         for (var _each in keyFrame) {
             if (useTransition) {
                 animation.push({
-                    key: keyFramePropsType === 'css' ? (0, _dom.cssPrefix)(_each) : _each,
+                    key: keyFramePropsType === 'css' ? (0, _changlinWdtools.cssPrefix)(_each) : _each,
                     endValue: keyFrame[_each],
                     unit: ''
                 });
             } else {
-                var _temp = splitUnit(keyFrame[_each], true);
-                if ((0, _changlinUtil.isUndefined)(_temp.v)) return;
+                var _temp = (0, _changlinUtil.splitUnit)(keyFrame[_each], true);
+                if ((0, _changlinUtil.isUndefined)(_temp.value)) return;
 
                 animation.push({
-                    key: keyFramePropsType === 'css' ? (0, _dom.cssPrefix)(_each) : _each,
-                    endValue: _temp.v,
+                    key: keyFramePropsType === 'css' ? (0, _changlinWdtools.cssPrefix)(_each) : _each,
+                    endValue: _temp.value,
                     unit: _temp.unit
                 });
             }
@@ -326,35 +324,7 @@ function stopTransition(animationConfig) {
     var currentStyle = window.getComputedStyle(animationConfig.target);
     for (var i = 0; i < animationConfig.animation.length; i++) {
         var temp = animationConfig.animation[i].key;
-        (0, _dom.css)(animationConfig.target, temp, currentStyle[temp]);
+        (0, _changlinWdtools.css)(animationConfig.target, temp, currentStyle[temp]);
     }
-    (0, _dom.css)(animationConfig.target, 'transitionProperty', 'none');
-}
-
-function splitUnit(value) {
-    var relative = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-    var v = void 0,
-        unit = '';
-    var reg = void 0;
-    if (relative) {
-        reg = /^((?:[-+]=?)?\d+(?:.\d+)?)([%a-zA-Z]*)/;
-    } else {
-        reg = /^((?:[-+])?\d+(?:.\d+)?)([%a-zA-Z]*)/;
-    }
-
-    if (reg.test(value)) {
-
-        var temp = RegExp.$1;
-        unit = RegExp.$2;
-        if (/^\d\S*$/.test(temp)) {
-            v = Number(temp);
-        } else {
-            v = temp;
-        }
-    }
-
-    return {
-        v: v, unit: unit
-    };
+    (0, _changlinWdtools.css)(animationConfig.target, 'transitionProperty', 'none');
 }

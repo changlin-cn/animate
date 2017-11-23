@@ -1,5 +1,4 @@
-export {easing} from "./easing";
-export {createAnimation} from './createAnimation'
-export {cancelAnimationFrame,requestAnimationFrame} from './af'
+export {createAnimation} from './createAnimation.js'
+export {transitionTimingFunction,easing} from './easing.js'
 
 

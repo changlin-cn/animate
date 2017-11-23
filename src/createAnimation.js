@@ -1,4 +1,7 @@
-import {easing as compute,transitionTimingFunction} from "./easing";
+import {
+    easing as compute,
+    transitionTimingFunction
+} from "./easing";
 import {
     isObject,
     isDOM,
@@ -11,10 +14,18 @@ import {
     isDate,
     sort,
     getOrSetProp,
-    extend
+    extend,
+    splitUnit
 } from 'changlin-util'
-import {css,cssPrefix,addEvent,removeEvent} from "./dom";
-import {requestAnimationFrame, cancelAnimationFrame} from "./af";
+
+import {
+    css,
+    cssPrefix,
+    addEventListener,
+    removeEventListener,
+    requestAnimationFrame,
+    cancelAnimationFrame
+} from 'changlin-wdtools'
 
 
 const transitionEventName=(()=>{
@@ -99,7 +110,7 @@ export function createAnimation(config) {
     function handleTransitionComplete(e) {
 
         animationConfig.onComplete.call(animationConfig.target,e);
-        removeEvent(animationConfig.target,transitionEventName,handleTransitionComplete)
+        removeEventListener(animationConfig.target,transitionEventName,handleTransitionComplete)
     }
 
     // debugger
@@ -122,7 +133,7 @@ export function createAnimation(config) {
         css(animationConfig.target,'transitionTimingFunction',animationConfig.easing);
         css(animationConfig.target,'transitionDelay',animationConfig.delay+'ms');
 
-        addEvent(animationConfig.target,transitionEventName,handleTransitionComplete);
+        addEventListener(animationConfig.target,transitionEventName,handleTransitionComplete);
         animationConfig.onStart.call(animationConfig.target);
         animationConfig.state=0;
         animationConfig.animation.forEach((n,i)=>{
@@ -144,7 +155,7 @@ export function createAnimation(config) {
             if (animationConfig.autoUpdate) {
                 if(animationConfig.useTransition){
                     stopTransition(animationConfig);
-                    removeEvent(animationConfig.target,transitionEventName,handleTransitionComplete);
+                    removeEventListener(animationConfig.target,transitionEventName,handleTransitionComplete);
                 }else{
                     cancelAnimationFrame(animationConfig.timer);
                 }
@@ -215,7 +226,7 @@ function updateState(time, params) {
             params.animation.forEach(function (n, idx) {
                 if (isArray(n.percent)) {
                     if (n.percent[0] !== 0) {
-                        n.values.unshift(splitUnit(params._getOrSetProp(params.target, n.key)).v);
+                        n.values.unshift(splitUnit(params._getOrSetProp(params.target, n.key)).value);
                         n.percent.unshift(0);
                     }
                 } else {
@@ -224,7 +235,7 @@ function updateState(time, params) {
                         currentValue = 0
                     }
                     let temp = splitUnit(currentValue);
-                    n.startValue = temp.v;
+                    n.startValue = temp.value;
                     if (/^(-=)\d+.?\d*$/.test(n.endValue)) {
                         n.endValue = n.startValue - Number(n.endValue.replace('-=', ''));
                     } else if (/^(\+=)\d+.?\d*$/.test(n.endValue)) {
@@ -302,7 +313,7 @@ function splitKeyframe({keyFrame, animation,keyFramePropsType,useTransition}) {
                 for (let i = 0; i < keyFrame.length; i++) {
                     let temp = splitUnit(keyFrame[i][each],true);
                     oneP.percent.push(keyFrame[i].percent);
-                    oneP.values.push(temp.v);
+                    oneP.values.push(temp.value);
                     oneP.unit = temp.unit;
                 }
                 animation.push(oneP)
@@ -319,11 +330,11 @@ function splitKeyframe({keyFrame, animation,keyFramePropsType,useTransition}) {
                 })
             }else{
                 let temp = splitUnit(keyFrame[each],true);
-                if (isUndefined(temp.v)) return;
+                if (isUndefined(temp.value)) return;
 
                 animation.push({
                     key: keyFramePropsType === 'css' ? cssPrefix(each) : each,
-                    endValue: temp.v,
+                    endValue: temp.value,
                     unit: temp.unit
                 })
             }
@@ -340,28 +351,3 @@ function stopTransition(animationConfig){
     css(animationConfig.target,'transitionProperty','none');
 }
 
-
-function splitUnit(value,relative=false) {
-    let v, unit = '';
-    let reg;
-    if(relative){
-        reg=/^((?:[-+]=?)?\d+(?:.\d+)?)([%a-zA-Z]*)/
-    }else{
-        reg=/^((?:[-+])?\d+(?:.\d+)?)([%a-zA-Z]*)/
-    }
-
-    if (reg.test(value)) {
-
-        let temp = RegExp.$1;
-        unit = RegExp.$2;
-        if (/^\d\S*$/.test(temp)) {
-            v = Number(temp);
-        } else {
-            v = temp;
-        }
-    }
-
-    return {
-        v, unit
-    }
-}
