@@ -57,7 +57,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "./";
+/******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 50);
@@ -1719,14 +1719,15 @@ window.onload = function () {
     (0, _createAnimation.createAnimation)({
         target: document.querySelector('#ani'),
         keyFrame: { 'left': '300px', 'top': '100px' },
-        useTransition: false
+        useTransition: false,
+        delay: 5000
     });
 
     (0, _createAnimation.createAnimation)({
         target: '#ani2',
         keyFrame: { 'left': '700px', 'top': '150px' },
         duration: 3000,
-        delay: 5000,
+        delay: 6000,
         useTransition: false
     });
 
@@ -1735,7 +1736,7 @@ window.onload = function () {
         keyFrame: [{ 'left': '0px', 'top': '0px', percent: 0 }, { 'left': '200px', 'top': '0px', percent: 25 }, { 'left': '200px', 'top': '120px', percent: 50 }, { 'left': '0px', 'top': '120px', percent: 75 }, { 'left': '0px', 'top': '0px', percent: 100 }],
         duration: 3000,
         useTransition: false,
-        delay: 8000
+        delay: 9000
 
     });
 
@@ -1743,7 +1744,7 @@ window.onload = function () {
         target: '#ani4',
         keyFrame: { 'left': '+=300px', 'top': '-=100px' },
         duration: 3000,
-        delay: 11000,
+        delay: 12000,
         useTransition: false
 
     });

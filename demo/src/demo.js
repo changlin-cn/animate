@@ -33,13 +33,14 @@ window.onload=()=>{
         target:document.querySelector('#ani'),
         keyFrame:{'left':'300px','top':'100px'},
         useTransition:false,
+        delay:5000,
     });
 
     createAnimation({
         target:'#ani2',
         keyFrame:{'left':'700px','top':'150px'},
         duration:3000,
-        delay:5000,
+        delay:6000,
         useTransition:false,
     });
 
@@ -54,7 +55,7 @@ window.onload=()=>{
         ],
         duration:3000,
         useTransition:false,
-        delay:8000,
+        delay:9000,
 
     });
 
@@ -62,7 +63,7 @@ window.onload=()=>{
         target:'#ani4',
         keyFrame:{'left':'+=300px','top':'-=100px'},
         duration:3000,
-        delay:11000,
+        delay:12000,
         useTransition:false,
 
     });

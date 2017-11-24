@@ -10,7 +10,7 @@ module.exports = {
     output: {
         filename: '[name].[hash].js',
         path: path.resolve(__dirname, 'demo/dist'),
-        publicPath: './'
+        //publicPath: './'
     },
     module: {
         rules: [
@@ -39,7 +39,6 @@ module.exports = {
         }),
     ],
     devServer: {
-        contentBase: './demo/dist',
 
     }
 }
