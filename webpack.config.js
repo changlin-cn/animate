@@ -1,13 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const cleanWebpackPlugin=require('clean-webpack-plugin');
 module.exports = {
     devtool: false,
     entry: {
         index: path.join(__dirname, "./demo/src/demo.js")
     },
     output: {
-        filename: '[name].bundle.js',
+        filename: '[name].[hash].js',
         path: path.resolve(__dirname, 'demo/dist'),
         publicPath: './'
     },
@@ -30,7 +31,12 @@ module.exports = {
             title: 'Output Management',
             filename:'index.html',
             template:'./demo/src/test.html'
-        })
+        }),
+        new cleanWebpackPlugin(['*'], {
+            root: path.resolve(__dirname,'./demo/dist'),
+            verbose: true,
+            dry: false
+        }),
     ],
     devServer: {
         contentBase: './demo/dist',

@@ -1726,7 +1726,7 @@ window.onload = function () {
         target: '#ani2',
         keyFrame: { 'left': '700px', 'top': '150px' },
         duration: 3000,
-        delay: 2000,
+        delay: 5000,
         useTransition: false
     });
 
@@ -1735,7 +1735,7 @@ window.onload = function () {
         keyFrame: [{ 'left': '0px', 'top': '0px', percent: 0 }, { 'left': '200px', 'top': '0px', percent: 25 }, { 'left': '200px', 'top': '120px', percent: 50 }, { 'left': '0px', 'top': '120px', percent: 75 }, { 'left': '0px', 'top': '0px', percent: 100 }],
         duration: 3000,
         useTransition: false,
-        delay: 5000
+        delay: 8000
 
     });
 
@@ -1743,7 +1743,7 @@ window.onload = function () {
         target: '#ani4',
         keyFrame: { 'left': '+=300px', 'top': '-=100px' },
         duration: 3000,
-        delay: 8000,
+        delay: 11000,
         useTransition: false
 
     });
