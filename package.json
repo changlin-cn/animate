@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm run build:commonjs",
     "build:commonjs": "babel src -d commonjs",
+    "build:demo":"webpack",
     "pb": "npm run build  && npm publish",
     "start": "webpack-dev-server --open"
   },

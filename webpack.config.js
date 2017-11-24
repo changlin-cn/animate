@@ -4,12 +4,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     devtool: false,
     entry: {
-        index: path.join(__dirname, "demo.js")
+        index: path.join(__dirname, "./demo/src/demo.js")
     },
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'test'),
-        publicPath: '/'
+        path: path.resolve(__dirname, 'demo/dist'),
+        publicPath: './'
     },
     module: {
         rules: [
@@ -28,11 +28,12 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             title: 'Output Management',
-            template:'test.html'
+            filename:'index.html',
+            template:'./demo/src/test.html'
         })
     ],
     devServer: {
-        contentBase: './test',
+        contentBase: './demo/dist',
 
     }
 }

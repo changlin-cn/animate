@@ -1,5 +1,5 @@
-import {createAnimation} from "./src/createAnimation";
-import {easing} from "./src/easing";
+import {createAnimation} from "../../src/createAnimation";
+import {easing} from "../../src/easing";
 
 window.onload=()=>{
 
