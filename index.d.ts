@@ -55,7 +55,7 @@ declare module "changlin-animate" {
         [key: string]: number | string;
     }
 
-    export const ransitionTimingFunction:{
+    export const transitionTimingFunction:{
         linear:string;
         ease:string;
         easeIn:string;
