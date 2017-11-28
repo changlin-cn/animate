@@ -1,6 +1,6 @@
 {
   "name": "changlin-animate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "animate:js animate or css3 transition",
   "main": "commonjs/index.js",
   "scripts": {
