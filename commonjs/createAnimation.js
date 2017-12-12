@@ -79,7 +79,7 @@ function createAnimation(config) {
 
     //获取动画开始时间
     if ((0, _changlinUtil.isNumber)(animationConfig.startTime)) {
-        animationConfig.startTime = new Date(animationConfig.startTime + delay);
+        animationConfig.startTime = new Date(animationConfig.startTime + animationConfig.delay);
     } else if (!(0, _changlinUtil.isDate)(animationConfig.startTime)) {
         if (animationConfig.autoUpdate) animationConfig.startTime = new Date(Date.now() + animationConfig.delay);
     }

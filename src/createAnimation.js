@@ -99,7 +99,7 @@ export function createAnimation(config) {
 
     //获取动画开始时间
     if (isNumber(animationConfig.startTime)) {
-        animationConfig.startTime = new Date(animationConfig.startTime + delay);
+        animationConfig.startTime = new Date(animationConfig.startTime + animationConfig.delay);
     } else if (!isDate(animationConfig.startTime)) {
         if (animationConfig.autoUpdate) animationConfig.startTime = new Date(Date.now() + animationConfig.delay);
     }
