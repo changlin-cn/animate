@@ -1,5 +1,5 @@
 {
-  "name": "changlin-animate",
+  "name": "animate",
   "version": "1.0.3",
   "description": "animate:js animate or css3 transition",
   "main": "commonjs/index.js",
